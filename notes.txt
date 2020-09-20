@@ -1,0 +1,324 @@
+
+Поведение бота:
+
+Любое личное сообщение сохраняется в таблицу шутеек
+
+В общем чате при первом заходе делается /start
+Чат добавляется в список отслеживаемых чатом.
+Бот пишет в чат своё приветствие
+По запросу /joke X
+Бот сохраняет последние X сообщений (не более 50, по умолчанию 5) в таблицу шутеек
+
+
+
+Простое сообщение:
+
+{
+    "update_id": 137577896,
+    "message": {
+        "message_id": 75,
+        "date": 1600293333,
+        "chat": {
+            "id": 820216855,
+            "type": "private",
+            "username": "kaleb_sadalmalik",
+            "first_name": "Глеб",
+            "last_name": "Кузьмин"
+        },
+        "text": "апр",
+        "entities": [],
+        "caption_entities": [],
+        "photo": [],
+        "new_chat_members": [],
+        "new_chat_photo": [],
+        "delete_chat_photo": false,
+        "group_chat_created": false,
+        "supergroup_chat_created": false,
+        "channel_chat_created": false,
+        "from": {
+            "id": 820216855,
+            "first_name": "Глеб",
+            "is_bot": false,
+            "last_name": "Кузьмин",
+            "username": "kaleb_sadalmalik",
+            "language_code": "ru"
+        }
+    }
+}
+
+
+
+
+
+Сообщение из чата:
+
+{
+    "update_id": 137577912,
+    "message": {
+        "message_id": 111,
+        "date": 1600467209,
+        "chat": {
+            "id": -383895079,
+            "type": "group",
+            "title": "Тест",
+            "all_members_are_administrators": true
+        },
+        "text": "воу",
+        "entities": [],
+        "caption_entities": [],
+        "photo": [],
+        "new_chat_members": [],
+        "new_chat_photo": [],
+        "delete_chat_photo": false,
+        "group_chat_created": false,
+        "supergroup_chat_created": false,
+        "channel_chat_created": false,
+        "from": {
+            "id": 820216855,
+            "first_name": "Глеб",
+            "is_bot": false,
+            "last_name": "Кузьмин",
+            "username": "kaleb_sadalmalik",
+            "language_code": "ru"
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+Сообщение с картинкой:
+
+
+{
+    "update_id": 137577892,
+    "message": {
+        "message_id": 62,
+        "date": 1600292585,
+        "chat": {
+            "id": 820216855,
+            "type": "private",
+            "username": "kaleb_sadalmalik",
+            "first_name": "Глеб",
+            "last_name": "Кузьмин"
+        },
+        "entities": [],
+        "caption_entities": [],
+        "photo": [
+            {
+                "file_id": "AgACAgIAAxkBAAM-X2KG6Vg-lwr8UOvA3D66lXH0Q5sAAtiuMRucKhlLS6YbdRHej52nxvGXLgADAQADAgADbQADQpwAAhsE",
+                "file_unique_id": "AQADp8bxly4AA0KcAAI",
+                "width": 192,
+                "height": 188,
+                "file_size": 21420
+            }
+        ],
+        "caption": "ОПА",
+        "new_chat_members": [],
+        "new_chat_photo": [],
+        "delete_chat_photo": false,
+        "group_chat_created": false,
+        "supergroup_chat_created": false,
+        "channel_chat_created": false,
+        "from": {
+            "id": 820216855,
+            "first_name": "Глеб",
+            "is_bot": false,
+            "last_name": "Кузьмин",
+            "username": "kaleb_sadalmalik",
+            "language_code": "ru"
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Ответ на сообщение:
+
+{
+    "update_id": 137577938,
+    "message": {
+        "message_id": 164,
+        "date": 1600548167,
+        "chat": {
+            "id": 820216855,
+            "type": "private",
+            "username": "kaleb_sadalmalik",
+            "first_name": "Глеб",
+            "last_name": "Кузьмин"
+        },
+        "reply_to_message": {
+            "message_id": 132,
+            "date": 1600548104,
+            "chat": {
+                "id": 820216855,
+                "type": "private",
+                "username": "kaleb_sadalmalik",
+                "first_name": "Глеб",
+                "last_name": "Кузьмин"
+            },
+            "text": "Однако дратути!",
+            "entities": [],
+            "caption_entities": [],
+            "photo": [],
+            "new_chat_members": [],
+            "new_chat_photo": [],
+            "delete_chat_photo": false,
+            "group_chat_created": false,
+            "supergroup_chat_created": false,
+            "channel_chat_created": false,
+            "from": {
+                "id": 1219327517,
+                "first_name": "Твоя бабуля",
+                "is_bot": true,
+                "username": "senchenko_bot"
+            }
+        },
+        "text": "опа",
+        "entities": [],
+        "caption_entities": [],
+        "photo": [],
+        "new_chat_members": [],
+        "new_chat_photo": [],
+        "delete_chat_photo": false,
+        "group_chat_created": false,
+        "supergroup_chat_created": false,
+        "channel_chat_created": false,
+        "from": {
+            "id": 820216855,
+            "first_name": "Глеб",
+            "is_bot": false,
+            "last_name": "Кузьмин",
+            "username": "kaleb_sadalmalik",
+            "language_code": "ru"
+        }
+    }
+}
+
+
+
+
+
+
+Пересланное сообщение:
+
+{
+    "update_id": 137577944,
+    "message": {
+        "message_id": 175,
+        "date": 1600548220,
+        "chat": {
+            "id": -383895079,
+            "type": "group",
+            "title": "Тест",
+            "all_members_are_administrators": true
+        },
+        "forward_from": {
+            "id": 1219327517,
+            "first_name": "Твоя бабуля",
+            "is_bot": true,
+            "username": "senchenko_bot"
+        },
+        "forward_date": 1600548104,
+        "text": "Однако дратути!",
+        "entities": [],
+        "caption_entities": [],
+        "photo": [],
+        "new_chat_members": [],
+        "new_chat_photo": [],
+        "delete_chat_photo": false,
+        "group_chat_created": false,
+        "supergroup_chat_created": false,
+        "channel_chat_created": false,
+        "from": {
+            "id": 820216855,
+            "first_name": "Глеб",
+            "is_bot": false,
+            "last_name": "Кузьмин",
+            "username": "kaleb_sadalmalik",
+            "language_code": "ru"
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+Сообщение с командой:
+
+{
+    "update_id": 137577945,
+    "message": {
+        "message_id": 179,
+        "date": 1600551761,
+        "chat": {
+            "id": 820216855,
+            "type": "private",
+            "username": "kaleb_sadalmalik",
+            "first_name": "Глеб",
+            "last_name": "Кузьмин"
+        },
+        "text": "/stop",
+        "entities": [
+            {
+                "type": "bot_command",
+                "offset": 0,
+                "length": 5
+            }
+        ],
+        "caption_entities": [],
+        "photo": [],
+        "new_chat_members": [],
+        "new_chat_photo": [],
+        "delete_chat_photo": false,
+        "group_chat_created": false,
+        "supergroup_chat_created": false,
+        "channel_chat_created": false,
+        "from": {
+            "id": 820216855,
+            "first_name": "Глеб",
+            "is_bot": false,
+            "last_name": "Кузьмин",
+            "username": "kaleb_sadalmalik",
+            "language_code": "ru"
+        }
+    }
+}
+
+
+
+
+
+

@@ -35,7 +35,7 @@ def main():
         try:
             result = f"Input command:\n\n{update}\n\n\n{context}"
             print(result)
-            bot.send_message(chat_id=820216855, text=result)
+            bot.send_message(chat_id=update.message.chat.id, text=result)
             if update.message.text == "/stop":
                 loop = False
         except Exception as exc:
@@ -43,9 +43,9 @@ def main():
 
     def HandleMessage(update, context):
         try:
-            result = f"Input command:\n\n{update}\n\n\n{context}"
+            result = f"Input message:\n\n{update}\n\n\n{context}"
             print(result)
-            bot.send_message(chat_id=820216855, text=result)
+            bot.send_message(chat_id=update.message.chat.id, text=result)
         except Exception as exc:
             print(f"Error: {exc}")
 
@@ -60,25 +60,22 @@ def main():
         print("Wait")
         time.sleep(10)
     print("Loop complete")
+    
+    updater.stop()
 
 
-# entry.866341572: Глб
-# entry.1846785254: Опа-па
-# fvv: 1
-# draftResponse: [null,null,"-4418110148297938397"]
-# pageHistory: 0
-# fbzx: -4418110148297938397
-def Store(name, content):
+def Store(name, content, source=True):
     jokeForm = "1FAIpQLSe_NtxJ9lxQ9ewMtZ1hRt8XyrbxamxNZNi5E1MvIsijCnjLTQ"
     GoogleForm.Send(jokeForm, {
         "entry.866341572": name,
         "entry.1846785254": content,
+        "entry.186773396": "Сенченко" if source else "Другие",
         "fvv": 1
     })
 
 
 if __name__ == '__main__':
-    # main()
-    Store("BOT", "TEST JOKE 1")
-    Store("BOT", "TEST JOKE 2")
-    Store("BOT", "TEST JOKE 3")
+    main()
+    # Store("BOT", "TEST JOKE 1")
+    # Store("BOT", "TEST JOKE 2")
+    # Store("BOT", "TEST JOKE 3")
