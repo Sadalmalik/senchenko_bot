@@ -11,7 +11,7 @@ import time
 
 from aiogram.types import ReplyKeyboardMarkup, InlineKeyboardButton, InlineKeyboardMarkup
 
-from aiogram import Bot, Dispatcher, types
+from aiogram import Bot, Dispatcher, executor, types
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import State, StatesGroup
 
@@ -39,7 +39,7 @@ async def send_welcome(message: types.Message):
 async def send_welcome(message: types.Message):
     global loop
     loop = False
-    await message.reply("Я завершаю свою работу!")
+    await message.reply("Я не умею завершаться :(")
 
 
 #
@@ -83,15 +83,12 @@ def Send(chat_id, message):
 
 
 if __name__ == '__main__':
-    loop = True
-    Send(820216855, f"Я начал работать!")
-    asyncio.run(dp.start_polling())
-    print("Aha!")
-    while loop:
-        time.sleep(1)
-    print("Aha!")
-    dp.stop_polling()
-    Send(820216855, f"Я закончил работать!")
+    executor.start_polling(dp, skip_updates=True)
+    # Send(820216855, f"Я начал работать!")
+    # while loop:
+    #     time.sleep(1)
+    # print("Aha!")
+    # Send(820216855, f"Я начал работать!")
 
     # response = requests.get("https://docs.google.com/spreadsheets/d/1cadXA41KEDUGvX5qJmwv80PgFj8tsxblzVXV-I1kcKE/edit?usp=sharing")
     # print()
