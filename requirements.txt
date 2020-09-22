@@ -1,0 +1,4 @@
+cryptography==2.9.2
+decorator==4.4.2
+requests==2.23.0
+aiogram==2.0
