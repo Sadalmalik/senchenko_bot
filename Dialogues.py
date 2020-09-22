@@ -95,9 +95,9 @@ async def rock_paper_scissors_dialogue(bot: aiogram.Bot, chat_id, queue: AsyncQu
             if answer == 'Да!':
                 continue
 
-            additional = "\n\nМне кажется или вы жульничали?\n(ノ ಠ 益ಠ) ノ 彡 ┻━┻" if user_wins>bot_wins+5 else ""
+            additional = "\n\nМне кажется или вы жульничали?\n(ノ ಠ 益ಠ) ノ 彡 ┻━┻" if user_wins > bot_wins + 5 else ""
             await bot.send_message(chat_id,
-                                   f"Выши победы: {user_wins}\nМои победы: {bot_wins}\nНичьи: {ties}{additional}",
+                                   f"Ваши победы: {user_wins}\nМои победы: {bot_wins}\nНичьи: {ties}{additional}",
                                    reply_markup=markup_clear)
             break
         await bot.send_message(chat_id, "Спасибо что плаваете поездами аэрофлота!", reply_markup=markup_clear)
