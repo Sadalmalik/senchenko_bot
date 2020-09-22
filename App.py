@@ -1,81 +1,90 @@
-"""
-This is a echo bot.
-It echoes any incoming text messages.
-"""
-
-import asyncio
 import logging
 import requests
+import asyncio
+import AsyncQueue
+import aiogram
 import Config
-import time
+import Dialogues
 
-from aiogram.types import ReplyKeyboardMarkup, InlineKeyboardButton, InlineKeyboardMarkup
-
-from aiogram import Bot, Dispatcher, executor, types
-from aiogram.dispatcher import FSMContext
-from aiogram.dispatcher.filters.state import State, StatesGroup
 
 Config.Load()
 
 logging.basicConfig(level=logging.INFO)
 
-bot = Bot(token=Config.data['TELEGRAM']['TOKEN'])
-dp = Dispatcher(bot)
+bot = aiogram.Bot(token=Config.data['TELEGRAM']['TOKEN'])
+dp = aiogram.Dispatcher(bot)
 
-bot_info = """Привет!
-Я пока ещё тестовый бот.
-Что бы меня выключить - напишите /stop
-"""
-loop = True
+
+dialogues_container = {}
+
+
+async def StartDialogue(chat_id, dialogue):
+    global dialogues_container
+    queue = AsyncQueue.Create()
+    dialogues_container[chat_id] = queue
+    await dialogue(bot, chat_id, queue)
+    del dialogues_container[chat_id]
+
+
+def DispatchMessage(chat_id, message):
+    if chat_id in dialogues_container:
+        # Если с данным перцем идёт диалог - передаём сообщение в диалог
+        dialogues_container[chat_id].add_message(message)
+        return True
+    # Если нет - ну хуй с ним!
+    return False
 
 
 @dp.message_handler(commands=['start', 'help'])
-async def send_welcome(message: types.Message):
+async def send_welcome(message: aiogram.types.Message):
     print(message.chat.id)
-    await message.reply(bot_info)
+    await message.reply("""Привет! Я тестовый бот.
+
+У меня есть такие команды:
+/start - для приветствия
+/number - что бы ввести число
+/rock_paper_scissors - что бы сыграть в камень-ножницы-бумагу
+/test_dialogue - тестовый диалог. Предыдущие две команды в него включены
+На всё остальное мне пох)
+""")
 
 
-@dp.message_handler(commands=['stop'])
-async def send_welcome(message: types.Message):
-    global loop
-    loop = False
-    await message.reply("Я не умею завершаться :(")
+@dp.message_handler(commands=['number'])
+async def number_dialogue(message: aiogram.types.Message):
+    await StartDialogue(message.chat.id, Dialogues.number_dialogue)
 
 
-#
-#
-# @dp.message_handler(state="*")
-# async def echo(message: types.Message):
-#     # old style:
-#     # await bot.send_message(message.chat.id, message.text)
-#     await message.answer(f"You send: {message.text}")
+@dp.message_handler(commands=['rock_paper_scissors'])
+async def rock_paper_scissors_dialogue(message: aiogram.types.Message):
+    await StartDialogue(message.chat.id, Dialogues.rock_paper_scissors_dialogue)
 
 
-def get_reply_keyboard():
-    reply = ReplyKeyboardMarkup(resize_keyboard=True)
-    reply.row("Да", "Нет", "Отмена")
-    return reply
+@dp.message_handler(commands=['test_dialogue'])
+async def test_dialogue(message: aiogram.types.Message):
+    await StartDialogue(message.chat.id, Dialogues.test_dialogue)
 
 
-def get_inline_keyboard():
-    inline = InlineKeyboardMarkup()
-    inline.row(
-        InlineKeyboardButton('Да', callback_data='Yes'),
-        InlineKeyboardButton('Нет', callback_data='No'),
-        InlineKeyboardButton('Пропустить', callback_data='Skip')
-    )
-    return inline
-
-
-@dp.message_handler(commands=['go'], state="*")
-async def start_answering(message: types.Message):
-    await message.answer("Выберите блюдо:", reply_markup=get_reply_keyboard())
+@dp.message_handler()
+async def process_regular_message(message: aiogram.types.Message):
+    # диалоги пока существуют только для приватной переписки (иначе просто придётся выдумывать ещё фильтрацию по user_id
+    if message.chat.type == "private":
+        if DispatchMessage(message.chat.id, message):
+            return
+    await bot.send_message(message.chat.id, "И чо?)")
 
 
 @dp.callback_query_handler()
-async def process_callback_button1(callback_query: types.CallbackQuery):
-    await bot.send_message(callback_query.from_user.id, f"Ваш ответ: '{callback_query.data}'")
+async def process_callback_message(callback_query: aiogram.types.CallbackQuery):
+    message = callback_query.message
+    if message.chat.type == "private":
+        if DispatchMessage(message.chat.id, callback_query):
+            await bot.answer_callback_query(callback_query.id)
+            return
     await bot.answer_callback_query(callback_query.id)
+    await bot.send_message(message.chat.id, "И чо?)")
+
+
+
 
 
 def Send(chat_id, message):
@@ -83,7 +92,7 @@ def Send(chat_id, message):
 
 
 if __name__ == '__main__':
-    executor.start_polling(dp, skip_updates=True)
+    aiogram.executor.start_polling(dp, skip_updates=True)
     # Send(820216855, f"Я начал работать!")
     # while loop:
     #     time.sleep(1)
