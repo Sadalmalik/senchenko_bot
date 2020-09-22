@@ -6,7 +6,7 @@ import random
 
 async def asc_question_dialogue(bot: aiogram.Bot, chat_id, queue: AsyncQueue.AsyncQueue, question, answers,
                                 wrong_answer, correct_answer=None):
-    markup_rpc = aiogram.types.ReplyKeyboardMarkup()
+    markup_rpc = aiogram.types.ReplyKeyboardMarkup(resize_keyboard=True)
     markup_rpc.row(*answers)
     answer = None
     await bot.send_message(chat_id, question, reply_markup=markup_rpc)
