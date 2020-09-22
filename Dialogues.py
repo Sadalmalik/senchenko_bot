@@ -56,6 +56,9 @@ async def rock_paper_scissors_dialogue(bot: aiogram.Bot, chat_id, queue: AsyncQu
         await bot.send_message(chat_id,
                                "Играем в Камень-Ножницы-Бумага.\nЯ загадываю что-то одно и говорю, чем оно не является.\nПоехали!",
                                reply_markup=markup_clear)
+        bot_wins = 0
+        user_wins = 0
+        ties = 0
         while True:
             choice = items[random.randint(0, 2)]
             others = [item for item in items if item != choice]
@@ -68,16 +71,19 @@ async def rock_paper_scissors_dialogue(bot: aiogram.Bot, chat_id, queue: AsyncQu
 
             # получили ответ - анализируем!
             if choice == answer:
+                ties += 1
                 await bot.send_message(chat_id, f"Вы загадали: {answer}\nЯ загадал тоже самое!\nУ нас ничья!",
                                        reply_markup=markup_clear)
             elif (choice == 'камень' and answer == 'ножницы') or \
                     (choice == 'ножницы' and answer == 'бумага') or \
                     (choice == 'бумага' and answer == 'камень'):
+                bot_wins += 1
                 await bot.send_message(chat_id, f"Вы загадали: {answer}\nЯ загадал: {choice}\nЯ победил!",
                                        reply_markup=markup_clear)
             elif (answer == 'камень' and choice == 'ножницы') or \
                     (answer == 'ножницы' and choice == 'бумага') or \
                     (answer == 'бумага' and choice == 'камень'):
+                user_wins += 1
                 await bot.send_message(chat_id, f"Вы загадали: {answer}\nЯ загадал: {choice}\nВы победили!",
                                        reply_markup=markup_clear)
 
@@ -88,6 +94,11 @@ async def rock_paper_scissors_dialogue(bot: aiogram.Bot, chat_id, queue: AsyncQu
 
             if answer == 'Да!':
                 continue
+
+            additional = "\n\nМне кажется или вы жульничали?\n(ノ ಠ 益ಠ) ノ 彡 ┻━┻" if user_wins>bot_wins+5 else ""
+            await bot.send_message(chat_id,
+                                   f"Выши победы: {user_wins}\nМои победы: {bot_wins}\nНичьи: {ties}{additional}",
+                                   reply_markup=markup_clear)
             break
         await bot.send_message(chat_id, "Спасибо что плаваете поездами аэрофлота!", reply_markup=markup_clear)
     except Exception as exc:
