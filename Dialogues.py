@@ -33,7 +33,8 @@ async def number_dialogue(bot: aiogram.Bot, chat_id, queue: AsyncQueue.AsyncQueu
         while True:
             m = await queue.get_message()
             if not isinstance(m, aiogram.types.CallbackQuery):
-                await bot.send_message(chat_id, "Введите число!", reply_markup=None)
+                await bot.send_message(chat_id, "Введите число с клавиатуры!", reply_markup=None)
+                continue
             if NumberKeyboard.handle_input(m.data, context):
                 await bot.edit_message_text(
                     chat_id=input.chat.id,
