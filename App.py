@@ -1,81 +1,102 @@
-# !/usr/bin/python
-# -*- coding: utf-8 -*-
+"""
+This is a echo bot.
+It echoes any incoming text messages.
+"""
 
-import os
+import asyncio
+import logging
 import requests
-import telegram
 import Config
-import json
 import time
-from telegram.ext import Updater
-from telegram.ext import Filters, MessageHandler, CommandHandler
-import random
-import GoogleForm
+
+from aiogram.types import ReplyKeyboardMarkup, InlineKeyboardButton, InlineKeyboardMarkup
+
+from aiogram import Bot, Dispatcher, types
+from aiogram.dispatcher import FSMContext
+from aiogram.dispatcher.filters.state import State, StatesGroup
 
 Config.Load()
 
-loop: bool = True
+logging.basicConfig(level=logging.INFO)
 
-def main():
+bot = Bot(token=Config.data['TELEGRAM']['TOKEN'])
+dp = Dispatcher(bot)
+
+bot_info = """Привет!
+Я пока ещё тестовый бот.
+Что бы меня выключить - напишите /stop
+"""
+loop = True
+
+
+@dp.message_handler(commands=['start', 'help'])
+async def send_welcome(message: types.Message):
+    print(message.chat.id)
+    await message.reply(bot_info)
+
+
+@dp.message_handler(commands=['stop'])
+async def send_welcome(message: types.Message):
     global loop
-    bot = telegram.Bot(token=Config.data['TELEGRAM']['TOKEN'])
-    bot.send_message(chat_id=820216855, text="Однако дратути!")
-
-    def HandleCommand(bot, update):
-        global loop
-        result = f"Input command:\n{json.dumps(bot)}\n{json.dumps(update)}"
-        print(result)
-        bot.send_message(chat_id=820216855, text=result)
-        if update.message.lower() == "/stop":
-            loop = False
-
-    def Stop(update, context):
-        print("AfFAfaaf")
-        global loop
-        try:
-            result = f"Input command:\n\n{update}\n\n\n{context}"
-            print(result)
-            bot.send_message(chat_id=update.message.chat.id, text=result)
-            if update.message.text == "/stop":
-                loop = False
-        except Exception as exc:
-            print(f"Error: {exc}")
-
-    def HandleMessage(update, context):
-        try:
-            result = f"Input message:\n\n{update}\n\n\n{context}"
-            print(result)
-            bot.send_message(chat_id=update.message.chat.id, text=result)
-        except Exception as exc:
-            print(f"Error: {exc}")
-
-    updater = Updater(token=Config.data['TELEGRAM']['TOKEN'], use_context=True)
-    # updater.dispatcher.add_handler(CommandHandler('start', start))
-    updater.dispatcher.add_handler(CommandHandler('stop', Stop), group=0)
-    # updater.dispatcher.add_handler(MessageHandler(Filters.command, HandleCommand), group=1)
-    updater.dispatcher.add_handler(MessageHandler(None, HandleMessage), group=1)
-    updater.start_polling()
-
-    while loop:
-        print("Wait")
-        time.sleep(10)
-    print("Loop complete")
-    
-    updater.stop()
+    loop = False
+    await message.reply("Я завершаю свою работу!")
 
 
-def Store(name, content, source=True):
-    jokeForm = "1FAIpQLSe_NtxJ9lxQ9ewMtZ1hRt8XyrbxamxNZNi5E1MvIsijCnjLTQ"
-    GoogleForm.Send(jokeForm, {
-        "entry.866341572": name,
-        "entry.1846785254": content,
-        "entry.186773396": "Сенченко" if source else "Другие",
-        "fvv": 1
-    })
+#
+#
+# @dp.message_handler(state="*")
+# async def echo(message: types.Message):
+#     # old style:
+#     # await bot.send_message(message.chat.id, message.text)
+#     await message.answer(f"You send: {message.text}")
+
+
+def get_reply_keyboard():
+    reply = ReplyKeyboardMarkup(resize_keyboard=True)
+    reply.row("Да", "Нет", "Отмена")
+    return reply
+
+
+def get_inline_keyboard():
+    inline = InlineKeyboardMarkup()
+    inline.row(
+        InlineKeyboardButton('Да', callback_data='Yes'),
+        InlineKeyboardButton('Нет', callback_data='No'),
+        InlineKeyboardButton('Пропустить', callback_data='Skip')
+    )
+    return inline
+
+
+@dp.message_handler(commands=['go'], state="*")
+async def start_answering(message: types.Message):
+    await message.answer("Выберите блюдо:", reply_markup=get_reply_keyboard())
+
+
+@dp.callback_query_handler()
+async def process_callback_button1(callback_query: types.CallbackQuery):
+    await bot.send_message(callback_query.from_user.id, f"Ваш ответ: '{callback_query.data}'")
+    await bot.answer_callback_query(callback_query.id)
+
+
+def Send(chat_id, message):
+    asyncio.run(bot.send_message(chat_id, message))
 
 
 if __name__ == '__main__':
-    main()
-    # Store("BOT", "TEST JOKE 1")
-    # Store("BOT", "TEST JOKE 2")
-    # Store("BOT", "TEST JOKE 3")
+    loop = True
+    Send(820216855, f"Я начал работать!")
+    asyncio.run(dp.start_polling())
+    print("Aha!")
+    while loop:
+        time.sleep(1)
+    print("Aha!")
+    dp.stop_polling()
+    Send(820216855, f"Я закончил работать!")
+
+    # response = requests.get("https://docs.google.com/spreadsheets/d/1cadXA41KEDUGvX5qJmwv80PgFj8tsxblzVXV-I1kcKE/edit?usp=sharing")
+    # print()
+    # print(response)
+    # print()
+    # print(response.content)
+    # print()
+    # print()
