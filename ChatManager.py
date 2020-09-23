@@ -26,10 +26,19 @@ def add_message(message: aiogram.types.Message):
     Config.Save()
 
 
-def get_messages(chat_id, count):
+def get_chat(chat_id):
+    chat_id = str(chat_id)
+    init_chat(chat_id)
+    return chats[chat_id]
+
+
+def get_messages(chat_id, count, username=None):
     chat_id = str(chat_id)
     if chat_id not in chats:
         return []
-    if count > len(chats[chat_id]["messages"]):
-        return chats[chat_id]["messages"]
-    return chats[chat_id]["messages"][-count:]
+    messages = chats[chat_id]["messages"]
+    if count > len(messages):
+        return messages
+    if username:
+        messages = [mes for mes in messages if mes['from'] == username]
+    return messages[-count:]
