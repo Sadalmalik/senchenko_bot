@@ -31,17 +31,9 @@ exception = """Во время моей работы случилась ошиб
 """
 
 save_tamplate = """Сохранил:
-'{text}'
+'{text}'"""
 
-Все сохранённые шутейки можно найти в гугл таблице:
-https://docs.google.com/spreadsheets/d/1LPNBZIMGUUyyuuUU4MSS9BESMuECQshzs6hrtMOwJuU/edit?usp=sharing
-"""
-
-save_tamplate_multy = """Сохранил сообщений: {count}
-
-Все сохранённые шутейки можно найти в гугл таблице:
-https://docs.google.com/spreadsheets/d/1LPNBZIMGUUyyuuUU4MSS9BESMuECQshzs6hrtMOwJuU/edit?usp=sharing
-"""
+save_tamplate_multy = """Сохранил сообщений: {count}"""
 
 save_fail_tamplate = """Мне не удалось сохранить сообщения...
 
