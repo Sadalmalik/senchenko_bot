@@ -3,7 +3,7 @@
 private_intro = """Привет! Я бот)
 Я буду сохранять все ваши текстовые сообщения и пересланные текстовые сообщения в специальную гугл таблицу для шуток.
 Все сохранённые шутейки можно найти в гугл таблице:
-https://docs.google.com/spreadsheets/d/1LPNBZIMGUUyyuuUU4MSS9BESMuECQshzs6hrtMOwJuU/edit?usp=sharing
+https://docs.google.com/spreadsheets/d/1CCeLQ_9XqiPJpfUsl4WbdYH993WO9ho0G8ZeG1YqDh8/edit?usp=sharing
 
 У меня есть такие команды
 Для личной переписки:
@@ -27,7 +27,7 @@ public_intro = """Всем привет!
 Так же вы можете писать мне в личку.
 
 Все сохранённые шутейки можно найти в гугл таблице:
-https://docs.google.com/spreadsheets/d/1LPNBZIMGUUyyuuUU4MSS9BESMuECQshzs6hrtMOwJuU/edit?usp=sharing
+https://docs.google.com/spreadsheets/d/1CCeLQ_9XqiPJpfUsl4WbdYH993WO9ho0G8ZeG1YqDh8/edit?usp=sharing
 """
 
 wrong_chat_joke = """Команды /joke, /j, /last, /l и /silence доступны только в публичном чате."""
