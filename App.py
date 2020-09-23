@@ -1,94 +1,80 @@
-import logging
-import requests
-import asyncio
-import AsyncQueue
-import aiogram
 import Config
-import Dialogues
-
 
 Config.Load()
 
-logging.basicConfig(level=logging.INFO)
+# import logging
+# import requests
+# import asyncio
+import aiogram
+import Dialogues
+import DialogueManager
+import Templates
+import ChatManager
+import GoogleForm
+
+# logging.basicConfig(level=logging.INFO)
 
 bot = aiogram.Bot(token=Config.data['TELEGRAM']['TOKEN'])
 dp = aiogram.Dispatcher(bot)
 
 
-dialogues_container = {}
-
-
-async def StartDialogue(chat_id, dialogue):
-    global dialogues_container
-    queue = AsyncQueue.Create()
-    dialogues_container[chat_id] = queue
-    await dialogue(bot, chat_id, queue)
-    del dialogues_container[chat_id]
-
-
-def DispatchMessage(chat_id, message):
-    if chat_id in dialogues_container:
-        # Если с данным перцем идёт диалог - передаём сообщение в диалог
-        dialogues_container[chat_id].add_message(message)
-        return True
-    # Если нет - ну хуй с ним!
-    return False
-
-
-@dp.message_handler(commands=['start', 'help'])
+@dp.message_handler(commands=['start'])
 async def send_welcome(message: aiogram.types.Message):
-    print(message.chat.id)
-    await message.reply("""Привет! Я тестовый бот.
+    chat_id = message.chat.id
+    if message.chat.type == 'private':
+        await bot.send_message(chat_id, Templates.private_intro)
+    else:
+        ChatManager.init_chat(message.chat.id)
+        await bot.send_message(chat_id, Templates.public_intro.format(
+            message_example=Config.data['TELEGRAM']['CHATS_DEFAULT'],
+            message_max=Config.data['TELEGRAM']['CHATS_LIMIT']
+        ))
 
-У меня есть такие команды:
-/start - для приветствия
-/number - чтобы ввести число
-/rock_paper_scissors - чтобы сыграть в камень-ножницы-бумагу
-/test_dialogue - тестовый диалог. Предыдущие две команды в него включены
-На всё остальное мне пох)
-""")
 
-
-@dp.message_handler(commands=['number'])
+@dp.message_handler(commands=['talk'])
 async def number_dialogue(message: aiogram.types.Message):
-    await StartDialogue(message.chat.id, Dialogues.number_dialogue)
+    await DialogueManager.start(message.chat.id, Dialogues.main_dialogue)
 
 
-@dp.message_handler(commands=['rock_paper_scissors'])
-async def rock_paper_scissors_dialogue(message: aiogram.types.Message):
-    await StartDialogue(message.chat.id, Dialogues.rock_paper_scissors_dialogue)
-
-
-@dp.message_handler(commands=['test_dialogue'])
+@dp.message_handler(commands=['joke', 'j'])
 async def test_dialogue(message: aiogram.types.Message):
-    await StartDialogue(message.chat.id, Dialogues.test_dialogue)
+    chat_id = message.chat.id
+    try:
+        arguments = message.text.split(' ')[1:]
+        count = Config.data['TELEGRAM']['CHATS_DEFAULT']
+        if len(arguments) > 0:
+            count = int(arguments[0])
+        messages = ChatManager.get_messages(chat_id, count)
+        is_serega = len([mes for mes in messages if mes['from'] == "captainkazah"]) > 0
+        text = "\n\n".join([f"{mes['date']} {mes['from']}:\n{mes['text']}" for mes in messages])
+        GoogleForm.StoreJoke(message.from_user.username, text, is_serega)
+    except Exception as exc:
+        await bot.send_message(chat_id, Templates.exception.format(exception=exc))
 
 
 @dp.message_handler()
 async def process_regular_message(message: aiogram.types.Message):
     # диалоги пока существуют только для приватной переписки (иначе просто придётся выдумывать ещё фильтрацию по user_id
     if message.chat.type == "private":
-        if DispatchMessage(message.chat.id, message):
+        if DialogueManager.dispatch_message(message.chat.id, message):
             return
-    await bot.send_message(message.chat.id, "И чо?)")
+        is_serega = False
+        is_serega = is_serega or (message.forward_from and message.forward_from.username == "captainkazah")
+        is_serega = is_serega or (message.from_user.username == "captainkazah")
+        GoogleForm.StoreJoke(message.from_user.username, message.text, is_serega)
+        await bot.send_message(message.chat.id, Templates.save_tamplate.format(text=message.text))
+    else:
+        ChatManager.add_message(message)
 
 
 @dp.callback_query_handler()
 async def process_callback_message(callback_query: aiogram.types.CallbackQuery):
     message = callback_query.message
     if message.chat.type == "private":
-        if DispatchMessage(message.chat.id, callback_query):
+        if DialogueManager.dispatch_message(message.chat.id, callback_query):
             await bot.answer_callback_query(callback_query.id)
             return
     await bot.answer_callback_query(callback_query.id)
-    await bot.send_message(message.chat.id, "И чо?)")
-
-
-
-
-
-def Send(chat_id, message):
-    asyncio.run(bot.send_message(chat_id, message))
 
 
 if __name__ == '__main__':

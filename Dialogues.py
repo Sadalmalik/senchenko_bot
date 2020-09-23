@@ -2,12 +2,17 @@ import AsyncQueue
 import NumberKeyboard
 import aiogram
 import random
+import Templates
 
 
 async def asc_question_dialogue(bot: aiogram.Bot, chat_id, queue: AsyncQueue.AsyncQueue, question, answers,
-                                wrong_answer, correct_answer=None):
+                                wrong_answer, correct_answer=None, is_list=False):
     markup_rpc = aiogram.types.ReplyKeyboardMarkup(resize_keyboard=True)
-    markup_rpc.row(*answers)
+    if is_list:
+        for answer in answers:
+            markup_rpc.add(answer)
+    else:
+        markup_rpc.row(*answers)
     answer = None
     await bot.send_message(chat_id, question, reply_markup=markup_rpc)
     while True:
@@ -45,14 +50,15 @@ async def number_dialogue(bot: aiogram.Bot, chat_id, queue: AsyncQueue.AsyncQueu
                 break
         await bot.send_message(chat_id, f"Вы ввели: {context.value}", reply_markup=None)
     except Exception as exc:
-        await bot.send_message(chat_id, f"У меня что-то сломалось :(\n\n{exc}", reply_markup=None)
+        await bot.send_message(chat_id,
+                               Templates.exception.format(exception=exc),
+                               reply_markup=aiogram.types.ReplyKeyboardRemove())
 
 
 async def rock_paper_scissors_dialogue(bot: aiogram.Bot, chat_id, queue: AsyncQueue.AsyncQueue):
     try:
         items = ['камень', 'ножницы', 'бумага']
         answers = ['Да!', 'Нет.']
-        markup_clear = aiogram.types.ReplyKeyboardRemove()
         await bot.send_message(chat_id,
                                "Играем в Камень-Ножницы-Бумага.\nЯ загадываю что-то одно и говорю, чем оно не является.\nПоехали!",
                                reply_markup=markup_clear)
@@ -100,9 +106,11 @@ async def rock_paper_scissors_dialogue(bot: aiogram.Bot, chat_id, queue: AsyncQu
                                    f"Ваши победы: {user_wins}\nМои победы: {bot_wins}\nНичьи: {ties}{additional}",
                                    reply_markup=markup_clear)
             break
-        await bot.send_message(chat_id, "Спасибо что плаваете поездами аэрофлота!", reply_markup=markup_clear)
+        await bot.send_message(chat_id, "Спасибо что плаваете поездами аэрофлота!", reply_markup=aiogram.types.ReplyKeyboardRemove())
     except Exception as exc:
-        await bot.send_message(chat_id, f"У меня что-то сломалось :(\n\n{exc}", reply_markup=markup_clear)
+        await bot.send_message(chat_id,
+                               Templates.exception.format(exception=exc),
+                               reply_markup=aiogram.types.ReplyKeyboardRemove())
 
 
 async def test_dialogue(bot: aiogram.Bot, chat_id, queue: AsyncQueue.AsyncQueue):
@@ -133,4 +141,42 @@ async def test_dialogue(bot: aiogram.Bot, chat_id, queue: AsyncQueue.AsyncQueue)
                 await bot.send_message(chat_id, "Ну ты и ебобо...")
 
     except Exception as exc:
-        await bot.send_message(chat_id, f"У меня что-то сломалось :(\n\n{exc}", reply_markup=markup_clear)
+        await bot.send_message(chat_id,
+                               Templates.exception.format(exception=exc),
+                               reply_markup=aiogram.types.ReplyKeyboardRemove())
+
+
+async def words_game(bot: aiogram.Bot, chat_id, queue: AsyncQueue.AsyncQueue):
+    try:
+        await bot.send_message(chat_id, "Меня пока не научили играть в слова :(")
+    except Exception as exc:
+        await bot.send_message(chat_id,
+                               Templates.exception.format(exception=exc),
+                               reply_markup=aiogram.types.ReplyKeyboardRemove())
+
+
+async def main_dialogue(bot: aiogram.Bot, chat_id, queue: AsyncQueue.AsyncQueue):
+    try:
+        first_enter = True
+        while True:
+            answer_1 = await asc_question_dialogue(
+                bot, chat_id, queue,
+                Templates.main_dialogue_intro if first_enter else Templates.main_dialogue_continue,
+                ['Ввести числа', 'Камень-ножницы-бумага', 'Игра в слова', 'Хватит'],
+                "Выберите один из вариантов ответа!", "Отлично!", True)
+            first_enter = False
+
+            if answer_1 == 'Ввести числа':
+                await number_dialogue(bot, chat_id, queue)
+                continue
+            elif answer_1 == 'Камень-ножницы-бумага':
+                await rock_paper_scissors_dialogue(bot, chat_id, queue)
+                continue
+            elif answer_1 == 'Игра в слова':
+                await words_game(bot, chat_id, queue)
+            elif answer_1 == 'Хватит':
+                break
+    except Exception as exc:
+        await bot.send_message(chat_id,
+                               Templates.exception.format(exception=exc),
+                               reply_markup=aiogram.types.ReplyKeyboardRemove())
