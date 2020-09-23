@@ -3,7 +3,7 @@ import ConfigFunctions
 
 Config.Load()
 
-# import logging
+import logging
 # import requests
 # import asyncio
 import aiogram
@@ -13,7 +13,7 @@ import Templates
 import ChatManager
 import GoogleForm
 
-# logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.INFO)
 
 bot = aiogram.Bot(token=Config.data['TELEGRAM']['TOKEN'])
 dp = aiogram.Dispatcher(bot)
@@ -22,13 +22,14 @@ dp = aiogram.Dispatcher(bot)
 @dp.message_handler(commands=['start'])
 async def send_welcome(message: aiogram.types.Message):
     ConfigFunctions.check_user(message)
+    logging.info(f"Handle message <{message.message_id}> from @{message.from_user.username}")
     chat_id = message.chat.id
     if message.chat.type == 'private':
         await bot.send_message(chat_id, Templates.private_intro)
     else:
         ChatManager.init_chat(message.chat.id)
         await bot.send_message(chat_id, Templates.public_intro.format(
-            message_example=Config.data['TELEGRAM']['CHATS_DEFAULT'],
+            message_default=Config.data['TELEGRAM']['CHATS_DEFAULT'],
             message_max=Config.data['TELEGRAM']['CHATS_LIMIT']
         ))
 
@@ -36,12 +37,14 @@ async def send_welcome(message: aiogram.types.Message):
 @dp.message_handler(commands=['talk'])
 async def number_dialogue(message: aiogram.types.Message):
     ConfigFunctions.check_user(message)
+    logging.info(f"Handle message <{message.message_id}> from @{message.from_user.username}")
     await DialogueManager.start(bot, message.chat.id, Dialogues.main_dialogue)
 
 
 @dp.message_handler(commands=['joke', 'j'])
 async def test_dialogue(message: aiogram.types.Message):
     ConfigFunctions.check_user(message)
+    logging.info(f"Handle message <{message.message_id}> from @{message.from_user.username}")
     chat_id = message.chat.id
     try:
         arguments = message.text.split(' ')[1:]
@@ -49,9 +52,13 @@ async def test_dialogue(message: aiogram.types.Message):
         if len(arguments) > 0:
             count = int(arguments[0])
         messages = ChatManager.get_messages(chat_id, count)
-        is_serega = len([mes for mes in messages if mes['from'] == "captainkazah"]) > 0
-        text = "\n\n".join([f"{mes['date']} {mes['from']}:\n{mes['text']}" for mes in messages])
-        GoogleForm.StoreJoke(message.from_user.username, text, is_serega)
+        if len(messages)>0:
+            is_serega = len([mes for mes in messages if mes['from'] == "captainkazah"]) > 0
+            text = "\n\n".join([f"{mes['date']} {mes['from']}:\n{mes['text']}" for mes in messages])
+            GoogleForm.StoreJoke(message.from_user.username, text, is_serega)
+            await bot.send_message(message.chat.id, Templates.save_tamplate_multy.format(count=len(messages)))
+        else:
+            await bot.send_message(message.chat.id, Templates.save_fail_tamplate)
     except Exception as exc:
         await bot.send_message(chat_id, Templates.exception.format(exception=exc))
 
@@ -59,6 +66,7 @@ async def test_dialogue(message: aiogram.types.Message):
 @dp.message_handler()
 async def process_regular_message(message: aiogram.types.Message):
     ConfigFunctions.check_user(message)
+    logging.info(f"Handle message <{message.message_id}> from @{message.from_user.username}")
     # диалоги пока существуют только для приватной переписки (иначе просто придётся выдумывать ещё фильтрацию по user_id
     if message.chat.type == "private":
         if DialogueManager.dispatch_message(message.chat.id, message):
@@ -75,6 +83,7 @@ async def process_regular_message(message: aiogram.types.Message):
 @dp.callback_query_handler()
 async def process_callback_message(callback_query: aiogram.types.CallbackQuery):
     message = callback_query.message
+    logging.info(f"Handle message <{message.message_id}> from @{message.from_user.username}")
     if message.chat.type == "private":
         if DialogueManager.dispatch_message(message.chat.id, callback_query):
             await bot.answer_callback_query(callback_query.id)

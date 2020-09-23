@@ -34,6 +34,19 @@ save_tamplate = """Сохранил:
 https://docs.google.com/spreadsheets/d/1ACWRchSKpamsQNgLmkbv6aualXYA1r8R_N_EGAOWZVI/edit?usp=sharing
 """
 
+save_tamplate_multy = """Сохранил сообщений: {count}
+
+Все сохранённые шутейки можно найти в гугл таблице:
+https://docs.google.com/spreadsheets/d/1ACWRchSKpamsQNgLmkbv6aualXYA1r8R_N_EGAOWZVI/edit?usp=sharing
+"""
+
+save_fail_tamplate = """Мне не удалось сохранить сообщения...
+
+У меня дырявая память и я не умею читать :(
+Пожалуйста не ругайте меня :(
+"""
+
+
 main_dialogue_intro = """О! Ну давай общаться (͡ ° ͜ʖ ͡ °)
 
 Я могу:

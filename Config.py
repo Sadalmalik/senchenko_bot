@@ -16,4 +16,5 @@ def Load():
 def Save():
     global data
     with open('config.json', 'w', encoding='utf8') as file:
-        json.dump(data, file, indent=2)
+        js_str = json.dumps(data, indent=2)
+        file.write(js_str)
