@@ -17,6 +17,6 @@ def StoreJoke(name, content, source=True):
     Send(jokeForm, {
         "entry.866341572": name,
         "entry.1846785254": content,
-        "entry.186773396": "Сенченко" if source else "Другие",
+        "entry.186773396": "Серёга" if source else "Другие",
         "fvv": 1
     })

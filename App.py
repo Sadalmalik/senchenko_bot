@@ -45,20 +45,23 @@ async def number_dialogue(message: aiogram.types.Message):
 async def test_dialogue(message: aiogram.types.Message):
     ConfigFunctions.check_user(message)
     logging.info(f"Handle message <{message.message_id}> from @{message.from_user.username}")
-    chat_id = message.chat.id
     try:
-        arguments = message.text.split(' ')[1:]
-        count = Config.data['TELEGRAM']['CHATS_DEFAULT']
-        if len(arguments) > 0:
-            count = int(arguments[0])
-        messages = ChatManager.get_messages(chat_id, count)
-        if len(messages)>0:
-            is_serega = len([mes for mes in messages if mes['from'] == "captainkazah"]) > 0
-            text = "\n\n".join([f"{mes['date']} {mes['from']}:\n{mes['text']}" for mes in messages])
-            GoogleForm.StoreJoke(message.from_user.username, text, is_serega)
-            await bot.send_message(message.chat.id, Templates.save_tamplate_multy.format(count=len(messages)))
-        else:
-            await bot.send_message(message.chat.id, Templates.save_fail_tamplate)
+        if message.chat.type == "private":
+            await bot.send_message(message.chat.id, Templates.wrong_chat_joke)
+        elif message.chat.type == "group":
+            arguments = message.text.split(' ')[1:]
+            count = Config.data['TELEGRAM']['CHATS_DEFAULT']
+            if len(arguments) > 0:
+                count = int(arguments[0])
+            messages = ChatManager.get_messages(message.chat.id, count)
+            if len(messages) > 0:
+                is_serega = len([mes for mes in messages if mes['from'] == "captainkazah"]) > 0
+                text = "\n\n".join([f"{mes['date']} {mes['from']}:\n{mes['text']}" for mes in messages])
+                text = f"Chat: {message.chat.title}\n\n{text}"
+                GoogleForm.StoreJoke(message.from_user.username, text, is_serega)
+                await bot.send_message(message.chat.id, Templates.save_tamplate_multy.format(count=len(messages)))
+            else:
+                await bot.send_message(message.chat.id, Templates.save_fail_tamplate)
     except Exception as exc:
         await bot.send_message(chat_id, Templates.exception.format(exception=exc))
 
