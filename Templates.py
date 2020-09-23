@@ -3,7 +3,7 @@
 private_intro = """Привет! Я бот)
 Я буду сохранять все ваши текстовые сообщения и пересланные текстовые сообщения в специальную гугл таблицу для шуток.
 Все сохранённые шутейки можно найти в гугл таблице:
-https://docs.google.com/spreadsheets/d/1LPNBZIMGUUyyuuUU4MSS9BESMuECQshzs6hrtMOwJuU/edit#gid=1657868000
+https://docs.google.com/spreadsheets/d/1LPNBZIMGUUyyuuUU4MSS9BESMuECQshzs6hrtMOwJuU/edit?usp=sharing
 
 Так же у меня есть такие команды:
 /start - для этого приветствия
@@ -19,7 +19,7 @@ public_intro = """Всем привет!
 Так же вы можете присылать их мне в личку.
 
 Все сохранённые шутейки можно найти в гугл таблице:
-https://docs.google.com/spreadsheets/d/1LPNBZIMGUUyyuuUU4MSS9BESMuECQshzs6hrtMOwJuU/edit#gid=1657868000
+https://docs.google.com/spreadsheets/d/1LPNBZIMGUUyyuuUU4MSS9BESMuECQshzs6hrtMOwJuU/edit?usp=sharing
 """
 
 wrong_chat_joke = """Команды /joke и /j доступны только в публичном чате."""
@@ -34,13 +34,13 @@ save_tamplate = """Сохранил:
 '{text}'
 
 Все сохранённые шутейки можно найти в гугл таблице:
-https://docs.google.com/spreadsheets/d/1LPNBZIMGUUyyuuUU4MSS9BESMuECQshzs6hrtMOwJuU/edit#gid=1657868000
+https://docs.google.com/spreadsheets/d/1LPNBZIMGUUyyuuUU4MSS9BESMuECQshzs6hrtMOwJuU/edit?usp=sharing
 """
 
 save_tamplate_multy = """Сохранил сообщений: {count}
 
 Все сохранённые шутейки можно найти в гугл таблице:
-https://docs.google.com/spreadsheets/d/1LPNBZIMGUUyyuuUU4MSS9BESMuECQshzs6hrtMOwJuU/edit#gid=1657868000
+https://docs.google.com/spreadsheets/d/1LPNBZIMGUUyyuuUU4MSS9BESMuECQshzs6hrtMOwJuU/edit?usp=sharing
 """
 
 save_fail_tamplate = """Мне не удалось сохранить сообщения...
