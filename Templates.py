@@ -2,6 +2,8 @@
 
 private_intro = """Привет! Я бот)
 Я буду сохранять все ваши текстовые сообщения и пересланные текстовые сообщения в специальную гугл таблицу для шуток.
+Все сохранённые шутейки можно найти в гугл таблице:
+https://docs.google.com/spreadsheets/d/1ACWRchSKpamsQNgLmkbv6aualXYA1r8R_N_EGAOWZVI/edit?usp=sharing
 
 Так же у меня есть такие команды:
 /start - для этого приветствия
@@ -14,6 +16,9 @@ public_intro = """Всем привет!
 Если тут происходит что-то смешное - пишите /joke или /j и я сохраню последние {message_default} сообщений.
 Вы можете указать другое число сообщений: /j 7 - и я сохраню 7 сообщений.
 Но не более {message_max}.
+
+Все сохранённые шутейки можно найти в гугл таблице:
+https://docs.google.com/spreadsheets/d/1ACWRchSKpamsQNgLmkbv6aualXYA1r8R_N_EGAOWZVI/edit?usp=sharing
 """
 
 exception = """Во время моей работы случилась ошибка :(

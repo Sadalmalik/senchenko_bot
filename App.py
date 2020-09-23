@@ -36,7 +36,7 @@ async def send_welcome(message: aiogram.types.Message):
 @dp.message_handler(commands=['talk'])
 async def number_dialogue(message: aiogram.types.Message):
     ConfigFunctions.check_user(message)
-    await DialogueManager.start(message.chat.id, Dialogues.main_dialogue)
+    await DialogueManager.start(bot, message.chat.id, Dialogues.main_dialogue)
 
 
 @dp.message_handler(commands=['joke', 'j'])
