@@ -1,4 +1,5 @@
 import Config
+import ConfigFunctions
 
 Config.Load()
 
@@ -20,6 +21,7 @@ dp = aiogram.Dispatcher(bot)
 
 @dp.message_handler(commands=['start'])
 async def send_welcome(message: aiogram.types.Message):
+    ConfigFunctions.check_user(message)
     chat_id = message.chat.id
     if message.chat.type == 'private':
         await bot.send_message(chat_id, Templates.private_intro)
@@ -33,11 +35,13 @@ async def send_welcome(message: aiogram.types.Message):
 
 @dp.message_handler(commands=['talk'])
 async def number_dialogue(message: aiogram.types.Message):
+    ConfigFunctions.check_user(message)
     await DialogueManager.start(message.chat.id, Dialogues.main_dialogue)
 
 
 @dp.message_handler(commands=['joke', 'j'])
 async def test_dialogue(message: aiogram.types.Message):
+    ConfigFunctions.check_user(message)
     chat_id = message.chat.id
     try:
         arguments = message.text.split(' ')[1:]
@@ -54,6 +58,7 @@ async def test_dialogue(message: aiogram.types.Message):
 
 @dp.message_handler()
 async def process_regular_message(message: aiogram.types.Message):
+    ConfigFunctions.check_user(message)
     # диалоги пока существуют только для приватной переписки (иначе просто придётся выдумывать ещё фильтрацию по user_id
     if message.chat.type == "private":
         if DialogueManager.dispatch_message(message.chat.id, message):
