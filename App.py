@@ -14,7 +14,7 @@ import ChatManager
 import GoogleForm
 import traceback
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.WARNING)
 
 bot = aiogram.Bot(token=Config.data['TELEGRAM']['TOKEN'])
 dp = aiogram.Dispatcher(bot)
