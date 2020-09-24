@@ -65,31 +65,37 @@ async def send_welcome(message: aiogram.types.Message):
 async def main_dialogue(message: aiogram.types.Message):
     logging.info(f"Handle message <{message.message_id}> from @{message.from_user.username}")
     chat_id = message.chat.id
-    if message.chat.type == "private":
-        await DialogueManager.start(bot, message.chat.id, Dialogues.main_dialogue)
-    elif message.chat.type == "group":
-        user_session = ConfigFunctions.get_user(message)
-        chat_session = ChatManager.get_chat(chat_id)
-        silence = chat_session['silence']
-        if await CheckUserForbidden(user_session, message, silence):
-            return
-        if not silence:
-            await bot.send_message(message.chat.id, "Эта команда доступна только в личной переписке!")
+    try:
+        if message.chat.type == "private":
+            await DialogueManager.start(bot, message.chat.id, Dialogues.main_dialogue)
+        elif message.chat.type == "group":
+            user_session = ConfigFunctions.get_user(message)
+            chat_session = ChatManager.get_chat(chat_id)
+            silence = chat_session['silence']
+            if await CheckUserForbidden(user_session, message, silence):
+                return
+            if not silence:
+                await bot.send_message(message.chat.id, "Эта команда доступна только в личной переписке!")
+    except Exception as exc:
+        logging.info(f"Exception: {exc}")
+        traceback.print_exc()
+        await NotificateAdmins(exc)
+
 
 
 @dp.message_handler(commands=['mute'])
 async def set_silence(message: aiogram.types.Message):
     logging.info(f"Handle message <{message.message_id}> from @{message.from_user.username}")
     chat_id = message.chat.id
-    user_session = ConfigFunctions.get_user(message)
-    chat_session = ChatManager.get_chat(chat_id)
-    silence = chat_session['silence']
-    if await CheckUserForbidden(user_session, message, silence):
-        return
     try:
         if message.chat.type == "private":
-            await DialogueManager.start(bot, message.chat.id, Dialogues.main_dialogue)
+            await bot.send_message(message.chat.id, "Эта команда доступна только чате!")
         elif message.chat.type == "group":
+            user_session = ConfigFunctions.get_user(message)
+            chat_session = ChatManager.get_chat(chat_id)
+            silence = chat_session['silence']
+            if await CheckUserForbidden(user_session, message, silence):
+                return
             flag = False
             arguments = message.text.split(' ')[1:]
             if len(arguments) > 0:
@@ -184,21 +190,28 @@ async def save_joke(message: aiogram.types.Message):
 @dp.message_handler()
 async def process_regular_message(message: aiogram.types.Message):
     logging.info(f"Handle message <{message.message_id}> from @{message.from_user.username}")
-    user = ConfigFunctions.get_user(message)
-    if await CheckUserForbidden(user, message):
-        return
+    chat_id = message.chat.id
     try:
-        # диалоги пока существуют только для приватной переписки (иначе просто придётся выдумывать ещё фильтрацию по user_id
         if message.chat.type == "private":
-            if DialogueManager.dispatch_message(message.chat.id, message):
+            # диалоги пока существуют только для приватной переписки (иначе просто придётся выдумывать ещё фильтрацию по user_id
+            if message.chat.type == "private":
+                if DialogueManager.dispatch_message(message.chat.id, message):
+                    return
+                is_serega = False
+                is_serega = is_serega or (message.forward_from and message.forward_from.username == "captainkazah")
+                is_serega = is_serega or (message.from_user.username == "captainkazah")
+                GoogleForm.StoreJoke(message.from_user.username, message.text, is_serega)
+                await bot.send_message(message.chat.id, Templates.save_tamplate.format(text=message.text))
+            else:
+                ChatManager.add_message(message)
+        elif message.chat.type == "group":
+            user_session = ConfigFunctions.get_user(message)
+            chat_session = ChatManager.get_chat(chat_id)
+            silence = chat_session['silence']
+            if await CheckUserForbidden(user_session, message, silence):
                 return
-            is_serega = False
-            is_serega = is_serega or (message.forward_from and message.forward_from.username == "captainkazah")
-            is_serega = is_serega or (message.from_user.username == "captainkazah")
-            GoogleForm.StoreJoke(message.from_user.username, message.text, is_serega)
-            await bot.send_message(message.chat.id, Templates.save_tamplate.format(text=message.text))
-        else:
-            ChatManager.add_message(message)
+            if not silence:
+                await bot.send_message(message.chat.id, "Эта команда доступна только в личной переписке!")
     except Exception as exc:
         logging.info(f"Exception: {exc}")
         traceback.print_exc()
