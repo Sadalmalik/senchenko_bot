@@ -190,28 +190,18 @@ async def save_joke(message: aiogram.types.Message):
 @dp.message_handler()
 async def process_regular_message(message: aiogram.types.Message):
     logging.info(f"Handle message <{message.message_id}> from @{message.from_user.username}")
-    chat_id = message.chat.id
     try:
+        # диалоги пока существуют только для приватной переписки (иначе просто придётся выдумывать ещё фильтрацию по user_id
         if message.chat.type == "private":
-            # диалоги пока существуют только для приватной переписки (иначе просто придётся выдумывать ещё фильтрацию по user_id
-            if message.chat.type == "private":
-                if DialogueManager.dispatch_message(message.chat.id, message):
-                    return
-                is_serega = False
-                is_serega = is_serega or (message.forward_from and message.forward_from.username == "captainkazah")
-                is_serega = is_serega or (message.from_user.username == "captainkazah")
-                GoogleForm.StoreJoke(message.from_user.username, message.text, is_serega)
-                await bot.send_message(message.chat.id, Templates.save_tamplate.format(text=message.text))
-            else:
-                ChatManager.add_message(message)
-        elif message.chat.type == "group":
-            user_session = ConfigFunctions.get_user(message)
-            chat_session = ChatManager.get_chat(chat_id)
-            silence = chat_session['silence']
-            if await CheckUserForbidden(user_session, message, silence):
+            if DialogueManager.dispatch_message(message.chat.id, message):
                 return
-            if not silence:
-                await bot.send_message(message.chat.id, "Эта команда доступна только в личной переписке!")
+            is_serega = False
+            is_serega = is_serega or (message.forward_from and message.forward_from.username == "captainkazah")
+            is_serega = is_serega or (message.from_user.username == "captainkazah")
+            GoogleForm.StoreJoke(message.from_user.username, message.text, is_serega)
+            await bot.send_message(message.chat.id, Templates.save_tamplate.format(text=message.text))
+        else:
+            ChatManager.add_message(message)
     except Exception as exc:
         logging.info(f"Exception: {exc}")
         traceback.print_exc()
