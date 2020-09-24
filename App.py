@@ -20,12 +20,13 @@ bot = aiogram.Bot(token=Config.data['TELEGRAM']['TOKEN'])
 dp = aiogram.Dispatcher(bot)
 
 
-async def CheckUserForbidden(user, message: aiogram.types.Message):
+async def CheckUserForbidden(user, message: aiogram.types.Message, silence=False):
     if message.chat.type == "group":
         if "forbidden" in user and user["forbidden"]:
             if "forbidden-text" in user:
-                await message.reply(
-                    f'Извините, я не могу выполнить вашу команду в этом чате.\nПричина:\n\n{user["forbidden-text"]}')
+                if not silence:
+                    await message.reply(
+                        f'Извините, я не могу выполнить вашу команду в этом чате.\nПричина:\n\n{user["forbidden-text"]}')
             return True
     return False
 
@@ -40,10 +41,11 @@ async def NotificateAdmins(exc):
 async def send_welcome(message: aiogram.types.Message):
     logging.info(f"Handle message <{message.message_id}> from @{message.from_user.username}")
     chat_id = message.chat.id
-    user = ConfigFunctions.get_user(message)
-    if await CheckUserForbidden(user, message):
+    user_session = ConfigFunctions.get_user(message)
+    chat_session = ChatManager.get_chat(chat_id)
+    silence = chat_session['silence']
+    if await CheckUserForbidden(user_session, message, silence):
         return
-    chat_id = message.chat.id
     try:
         if message.chat.type == 'private':
             await bot.send_message(chat_id, Templates.private_intro)
@@ -63,14 +65,14 @@ async def send_welcome(message: aiogram.types.Message):
 async def main_dialogue(message: aiogram.types.Message):
     logging.info(f"Handle message <{message.message_id}> from @{message.from_user.username}")
     chat_id = message.chat.id
-    user_session = ConfigFunctions.get_user(message)
-    if await CheckUserForbidden(user_session, message):
-        return
     if message.chat.type == "private":
         await DialogueManager.start(bot, message.chat.id, Dialogues.main_dialogue)
     elif message.chat.type == "group":
+        user_session = ConfigFunctions.get_user(message)
         chat_session = ChatManager.get_chat(chat_id)
         silence = chat_session['silence']
+        if await CheckUserForbidden(user_session, message, silence):
+            return
         if not silence:
             await bot.send_message(message.chat.id, "Эта команда доступна только в личной переписке!")
 
@@ -80,9 +82,10 @@ async def set_silence(message: aiogram.types.Message):
     logging.info(f"Handle message <{message.message_id}> from @{message.from_user.username}")
     chat_id = message.chat.id
     user_session = ConfigFunctions.get_user(message)
-    if await CheckUserForbidden(user_session, message):
-        return
     chat_session = ChatManager.get_chat(chat_id)
+    silence = chat_session['silence']
+    if await CheckUserForbidden(user_session, message, silence):
+        return
     try:
         if message.chat.type == "private":
             await DialogueManager.start(bot, message.chat.id, Dialogues.main_dialogue)
@@ -105,10 +108,10 @@ async def save_last(message: aiogram.types.Message):
     logging.info(f"Handle message <{message.message_id}> from @{message.from_user.username}")
     chat_id = message.chat.id
     user_session = ConfigFunctions.get_user(message)
-    if await CheckUserForbidden(user_session, message):
-        return
     chat_session = ChatManager.get_chat(chat_id)
     silence = chat_session['silence']
+    if await CheckUserForbidden(user_session, message, silence):
+        return
     try:
         if message.chat.type == "private":
             if not silence:
@@ -142,10 +145,10 @@ async def save_joke(message: aiogram.types.Message):
     logging.info(f"Handle message <{message.message_id}> from @{message.from_user.username}")
     chat_id = message.chat.id
     user_session = ConfigFunctions.get_user(message)
-    if await CheckUserForbidden(user_session, message):
-        return
     chat_session = ChatManager.get_chat(chat_id)
     silence = chat_session['silence']
+    if await CheckUserForbidden(user_session, message, silence):
+        return
     try:
         if message.chat.type == "private":
             if not silence:
