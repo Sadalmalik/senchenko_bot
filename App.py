@@ -66,11 +66,11 @@ async def main_dialogue(message: aiogram.types.Message):
     user_session = ConfigFunctions.get_user(message)
     if await CheckUserForbidden(user_session, message):
         return
-    chat_session = ChatManager.get_chat(chat_id)
-    silence = chat_session['silence']
     if message.chat.type == "private":
         await DialogueManager.start(bot, message.chat.id, Dialogues.main_dialogue)
     elif message.chat.type == "group":
+        chat_session = ChatManager.get_chat(chat_id)
+        silence = chat_session['silence']
         if not silence:
             await bot.send_message(message.chat.id, "Эта команда доступна только в личной переписке!")
 
