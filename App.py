@@ -43,7 +43,7 @@ async def send_welcome(message: aiogram.types.Message):
     chat_id = message.chat.id
     user_session = ConfigFunctions.get_user(message)
     chat_session = ChatManager.get_chat(chat_id)
-    silence = chat_session['silence']
+    silence = chat_session['silence'] if 'silence' in chat_session else False
     if await CheckUserForbidden(user_session, message, silence):
         return
     try:
@@ -71,7 +71,7 @@ async def main_dialogue(message: aiogram.types.Message):
         elif message.chat.type == "group":
             user_session = ConfigFunctions.get_user(message)
             chat_session = ChatManager.get_chat(chat_id)
-            silence = chat_session['silence']
+            silence = chat_session['silence'] if 'silence' in chat_session else False
             if await CheckUserForbidden(user_session, message, silence):
                 return
             if not silence:
@@ -93,7 +93,7 @@ async def set_silence(message: aiogram.types.Message):
         elif message.chat.type == "group":
             user_session = ConfigFunctions.get_user(message)
             chat_session = ChatManager.get_chat(chat_id)
-            silence = chat_session['silence']
+            silence = chat_session['silence'] if 'silence' in chat_session else False
             if await CheckUserForbidden(user_session, message, silence):
                 return
             flag = False
@@ -115,7 +115,7 @@ async def save_last(message: aiogram.types.Message):
     chat_id = message.chat.id
     user_session = ConfigFunctions.get_user(message)
     chat_session = ChatManager.get_chat(chat_id)
-    silence = chat_session['silence']
+    silence = chat_session['silence'] if 'silence' in chat_session else False
     if await CheckUserForbidden(user_session, message, silence):
         return
     try:
@@ -152,7 +152,7 @@ async def save_joke(message: aiogram.types.Message):
     chat_id = message.chat.id
     user_session = ConfigFunctions.get_user(message)
     chat_session = ChatManager.get_chat(chat_id)
-    silence = chat_session['silence']
+    silence = chat_session['silence'] if 'silence' in chat_session else False
     if await CheckUserForbidden(user_session, message, silence):
         return
     try:
